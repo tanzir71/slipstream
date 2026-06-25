@@ -1,0 +1,2 @@
+6be20908793bca035a488b573f0fff9bcd932a50753fa29d8c6d3ba745f6c931  Slipstream-linux-x64.deb
+ba4d8e23a796796e6b77f057f1c955a10ee2ab4ebafcdebf98cb6dbfcec51393  Slipstream-linux-x64.AppImage

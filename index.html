@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Slipstream — Record. Edit. Ship reels on your desktop.</title>
+<meta name="description" content="Slipstream is a native desktop screen + camera recorder and reel editor for Windows, macOS, and Linux. Transcription-based cutting, cinematic cursor zoom, camera PiP & split layouts, captions, and one-click 9:16 export — all on-device, all free." />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="mask-icon" href="favicon.svg" color="#6c8cff" />
+<meta property="og:title" content="Slipstream — Record. Edit. Ship reels on desktop." />
+<meta property="og:description" content="A native desktop recorder + reel editor for Windows, macOS, and Linux. On-device, private, free." />
+<meta property="og:type" content="website" />
+<style>
+  :root{
+    --bg:#08090c; --bg2:#0d0f14; --panel:#12141b; --panel2:#171a22;
+    --stroke:rgba(255,255,255,.10); --stroke2:rgba(255,255,255,.18);
+    --text:#f4f6fb; --muted:#9aa3b2; --faint:#6b7280;
+    --accent:#6c8cff; --accent2:#b07bff; --mint:#43e0c0; --pink:#ff7eb6;
+    --maxw:1180px;
+    --grad:linear-gradient(135deg,var(--accent),var(--accent2));
+  }
+  *{box-sizing:border-box;margin:0;padding:0;border-radius:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;
+    line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-weight:600;font-size:15px;
+    padding:13px 24px;border:1px solid transparent;cursor:pointer;transition:.16s}
+  .btn-primary{background:var(--accent);color:#fff}
+  header .btn-primary{background:var(--grad)}  /* gradient lives only in the hero */
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(108,140,255,.4)}
+  .btn-ghost{background:var(--panel);border-color:var(--stroke2);color:var(--text)}
+  .btn-ghost:hover{background:var(--panel2);border-color:var(--accent)}
+  .eyebrow{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);display:inline-block}
+  .muted{color:var(--muted)}
+
+  .glow{position:absolute;filter:blur(100px);opacity:.45;z-index:0;pointer-events:none}
+  .glow.a{width:520px;height:520px;background:#3a52d6;top:-180px;left:-120px}
+  .glow.b{width:440px;height:440px;background:#7b3ad6;top:60px;right:-150px;opacity:.4}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+    background:rgba(8,9,12,.72);border-bottom:1px solid var(--stroke)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:18px;letter-spacing:.01em}
+  .logo{width:30px;height:30px;background:var(--grad);display:grid;place-items:center}
+  .logo svg{width:16px;height:16px}
+  .nav-links{display:flex;gap:28px;align-items:center}
+  .nav-links a{font-size:14px;color:var(--muted);transition:.15s}
+  .nav-links a:hover{color:var(--text)}
+  .nav-links .nav-cta{color:#fff;padding:9px 16px;font-size:14px;box-shadow:0 10px 26px rgba(108,140,255,.24)}
+  .nav-links .nav-cta:hover{color:#fff;background:#7b96ff}
+  @media(max-width:760px){.nav-links a:not(.nav-cta){display:none}}
+
+  header{position:relative;overflow:hidden;padding:90px 0 40px}
+  .hero{position:relative;z-index:2;text-align:center;max-width:840px;margin:0 auto}
+  .badge{display:inline-flex;gap:8px;align-items:center;font-size:13px;color:var(--muted);
+    background:var(--panel);border:1px solid var(--stroke);padding:7px 14px;margin-bottom:26px}
+  .badge b{color:var(--mint);font-weight:700}
+  h1{font-size:clamp(40px,6.4vw,68px);line-height:1.02;letter-spacing:0;font-weight:800;text-wrap:balance}
+  h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .desktop-tail{display:inline}
+  .sub{font-size:clamp(17px,2.4vw,21px);color:var(--muted);margin:24px auto 0;max-width:640px}
+  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px}
+  .reassure{margin-top:18px;font-size:13px;color:var(--faint)}
+
+  .shot{position:relative;z-index:2;margin:58px auto 0;max-width:1000px}
+  .window{background:var(--panel);border:1px solid var(--stroke2);overflow:hidden;
+    box-shadow:0 50px 130px rgba(0,0,0,.65)}
+  .titlebar{height:38px;display:flex;align-items:center;gap:8px;padding:0 14px;background:var(--panel2);
+    border-bottom:1px solid var(--stroke)}
+  .sq{width:11px;height:11px}
+  .sq.r{background:#ff5f57}.sq.y{background:#febc2e}.sq.g{background:#28c840}
+  .titlebar span{margin-left:8px;font-size:12px;color:var(--faint)}
+  .editor{display:grid;grid-template-columns:1.1fr 1.5fr .9fr;height:344px}
+  .pane{padding:14px;border-right:1px solid var(--stroke);overflow:hidden}
+  .pane:last-child{border-right:0}
+  .pane h4{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:11px}
+  .line{height:9px;background:rgba(255,255,255,.07);margin-bottom:8px}
+  .line.s{width:60%}.line.m{width:85%}.line.hl{background:linear-gradient(90deg,var(--accent),transparent)}
+  .canvas{background:radial-gradient(120% 90% at 50% 0%,#2b3566,#0d1020);height:100%;position:relative;display:grid;place-items:center}
+  .frame916{width:122px;height:218px;background:linear-gradient(160deg,#1a2030,#0c0e16);
+    border:1px solid rgba(255,255,255,.14);position:relative;overflow:hidden}
+  .pip{position:absolute;right:8px;bottom:8px;width:48px;height:48px;
+    background:linear-gradient(135deg,#ffd1a8,#c97b53);border:2px solid rgba(255,255,255,.75)}
+  .cap{position:absolute;left:50%;transform:translateX(-50%);bottom:66px;font-size:9px;font-weight:800;
+    color:#fff;text-shadow:0 1px 2px #000;letter-spacing:.04em}
+  .cap b{color:var(--mint)}
+  .tl{padding:12px 14px;border-top:1px solid var(--stroke);background:var(--bg2)}
+  .track{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+  .track .lbl{width:42px;font-size:9px;color:var(--faint)}
+  .clip{height:16px;flex:1}
+  .clip.v{background:linear-gradient(90deg,#3a52d6,#6c8cff)}
+  .clip.z{background:#2a2e3a;flex:0 0 64px}
+  .clip.a{background:repeating-linear-gradient(90deg,#43e0c0 0 2px,transparent 2px 5px);opacity:.7}
+
+  .proof{padding:30px 0 8px;text-align:center}
+  .proof p{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+  .pill{font-size:13px;color:var(--muted);background:var(--panel);border:1px solid var(--stroke);padding:8px 14px}
+
+  section{position:relative;padding:88px 0}
+  .sec-head{text-align:center;max-width:680px;margin:0 auto 52px}
+  .sec-head h2{font-size:clamp(28px,4vw,42px);letter-spacing:0;line-height:1.1;font-weight:800}
+  .sec-head p{color:var(--muted);margin-top:14px;font-size:17px}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--stroke);border:1px solid var(--stroke)}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);padding:26px;transition:.16s}
+  .card:hover{background:var(--panel2)}
+  .ic{width:42px;height:42px;display:grid;place-items:center;margin-bottom:16px;
+    background:rgba(108,140,255,.12);border:1px solid rgba(108,140,255,.28)}
+  .ic svg{width:21px;height:21px;stroke:var(--accent);fill:none;stroke-width:1.7}
+  .card h3{font-size:18px;margin-bottom:8px;letter-spacing:0}
+  .card p{color:var(--muted);font-size:14.5px}
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;counter-reset:s}
+  @media(max-width:880px){.steps{grid-template-columns:1fr}}
+  .step{position:relative;padding:26px 22px;background:var(--panel);border:1px solid var(--stroke);border-left:3px solid var(--accent)}
+  .step .n{counter-increment:s;font-size:13px;font-weight:800;color:#fff;width:30px;height:30px;
+    background:var(--accent);display:grid;place-items:center;margin-bottom:14px}
+  .step .n::after{content:counter(s)}
+  .step h3{font-size:17px;margin-bottom:7px}
+  .step p{color:var(--muted);font-size:14px}
+
+  /* comparison matrix */
+  .matrix-scroll{overflow-x:auto;border:1px solid var(--stroke);background:var(--panel)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:920px}
+  th,td{padding:13px 14px;text-align:center;border-bottom:1px solid var(--stroke);border-right:1px solid var(--stroke);white-space:nowrap}
+  th:last-child,td:last-child{border-right:0}
+  thead th{font-size:12px;color:var(--muted);font-weight:700;background:var(--panel2);position:sticky;top:0}
+  tbody td:first-child,thead th:first-child{text-align:left;position:sticky;left:0;background:var(--panel);z-index:1}
+  thead th:first-child{background:var(--panel2);z-index:2}
+  .tool{font-weight:700;color:var(--text)}
+  .tool small{display:block;font-weight:400;color:var(--faint);font-size:11px;white-space:nowrap}
+  .us-row td{background:rgba(108,140,255,.10)}
+  .us-row td:first-child{background:rgba(108,140,255,.16)}
+  .us-row .tool{color:#fff}
+  .yes{color:var(--mint);font-weight:800}
+  .no{color:var(--faint)}
+  .part{color:#ffd479;font-weight:600}
+
+  .faq{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+  details{background:var(--panel);border:1px solid var(--stroke);padding:0 18px}
+  summary{cursor:pointer;font-weight:600;padding:12px 0;list-style:none;display:flex;justify-content:space-between;align-items:center;font-size:14.5px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--accent);font-size:20px;font-weight:400;line-height:1}
+  details[open] summary::after{content:"–"}
+  details p{color:var(--muted);padding:0 0 13px;font-size:14px}
+  code{background:#000;border:1px solid var(--stroke);padding:2px 6px;font-size:12.5px}
+
+  .download-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:32px auto 18px;max-width:980px;text-align:left}
+  @media(max-width:880px){.download-grid{grid-template-columns:1fr}}
+  .download-card{background:var(--panel);border:1px solid var(--stroke);padding:22px;display:flex;flex-direction:column;gap:14px;min-height:246px}
+  .download-card h3{font-size:20px;letter-spacing:0}
+  .download-card p{color:var(--muted);font-size:14px}
+  .download-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
+  .download-actions .btn{padding:10px 14px;font-size:13px}
+  .download-link{display:inline-flex;align-items:center;font-size:13px;font-weight:600;color:var(--muted);
+    border:1px solid var(--stroke);padding:9px 11px}
+  .download-link:hover{color:var(--text);border-color:var(--stroke2);background:var(--panel2)}
+  .download-meta{font-size:12.5px;color:var(--faint);line-height:1.45}
+  .final{position:relative;text-align:center;padding:24px 0 0;overflow:hidden}
+  .final h2{font-size:clamp(28px,4vw,40px);letter-spacing:0;font-weight:800}
+  .final p{color:var(--muted);margin:14px auto 28px;max-width:520px;font-size:17px}
+
+  @media(max-width:520px){
+    .nav-links{gap:0;min-width:0}
+    .nav-links .nav-cta{padding:9px 12px;font-size:13px;white-space:nowrap;box-shadow:0 8px 20px rgba(108,140,255,.2)}
+    .wrap{padding:0 20px}
+    .hero{max-width:100%}
+    .nav-in{height:58px}
+    .brand{gap:9px;font-size:17px;min-width:0}
+    header{padding:50px 0 32px}
+    .badge{display:flex;width:100%;max-width:100%;flex-wrap:wrap;justify-content:center;row-gap:2px;line-height:1.35;text-align:center;font-size:12.5px}
+    h1{font-size:34px;line-height:1.08}
+    .desktop-tail{display:block}
+    .sub{font-size:16px}
+    .hero .cta-row .btn{width:100%;justify-content:center}
+    .shot{margin-top:42px}
+    .editor{grid-template-columns:1fr;height:auto}
+    .pane{min-height:132px;border-right:0;border-bottom:1px solid var(--stroke)}
+    .pane:last-child{border-bottom:0}
+    .canvas{height:250px}
+    .download-actions .btn,.download-link{width:100%;justify-content:center}
+  }
+
+  footer{border-top:1px solid var(--stroke);padding:36px 0;margin-top:44px}
+  .foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;color:var(--faint);font-size:13px}
+  .foot a{color:var(--muted)}.foot a:hover{color:var(--text)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="#top">
+      <span class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4l13 8-13 8V4z" fill="#fff"/></svg></span>
+      Slipstream
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#compare">Compare</a>
+      <a href="#faq">FAQ</a>
+      <a class="nav-cta btn btn-primary" href="#download">Downloads</a>
+    </div>
+  </div>
+</nav>
+
+<header id="top">
+  <div class="glow a"></div><div class="glow b"></div>
+  <div class="wrap hero">
+    <span class="badge">🖥️ Windows, macOS &amp; Linux · <b>100% on-device</b> · Free &amp; open</span>
+    <h1>Record. Edit.<br><span class="g">Ship reels</span><span class="desktop-tail"> from your desktop.</span></h1>
+    <p class="sub">Slipstream is a native screen &amp; camera recorder with a real reel editor built in. Cut by editing the transcript, add cinematic zoom and captions, drop your camera into a PiP or split layout, and export a 9:16 short — without a single upload.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#download">↓ Download for your OS</a>
+      <a class="btn btn-ghost" href="#how">See how it works</a>
+    </div>
+    <div class="reassure">Free · No account · No watermark · Your footage never leaves your machine</div>
+  </div>
+
+  <div class="wrap shot">
+    <div class="window">
+      <div class="titlebar"><span class="sq r"></span><span class="sq y"></span><span class="sq g"></span><span>Slipstream — Sequence 1</span></div>
+      <div class="editor">
+        <div class="pane">
+          <h4>Transcript</h4>
+          <div class="line m"></div><div class="line s"></div><div class="line hl m"></div>
+          <div class="line s"></div><div class="line m"></div><div class="line s"></div>
+          <div class="line m"></div><div class="line hl s"></div>
+        </div>
+        <div class="pane" style="padding:0">
+          <div class="canvas">
+            <div class="frame916"><div class="pip"></div><div class="cap"><b>SLIPSTREAM</b></div></div>
+          </div>
+        </div>
+        <div class="pane">
+          <h4>Camera · Split</h4>
+          <div class="line m"></div><div class="line s"></div>
+          <h4 style="margin-top:18px">Background</h4>
+          <div class="line m"></div><div class="line s"></div>
+          <h4 style="margin-top:18px">Captions</h4>
+          <div class="line m"></div>
+        </div>
+      </div>
+      <div class="tl">
+        <div class="track"><span class="lbl">Zoom</span><div class="clip z"></div><div class="clip z" style="flex:0 0 90px"></div><div style="flex:1"></div></div>
+        <div class="track"><span class="lbl">Video</span><div class="clip v"></div></div>
+        <div class="track"><span class="lbl">Audio</span><div class="clip a"></div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap proof">
+  <p>One native app for what these tools split across the cloud</p>
+  <div class="pills">
+    <span class="pill">Screen &amp; camera capture</span>
+    <span class="pill">On-device transcription</span>
+    <span class="pill">Auto cursor zoom</span>
+    <span class="pill">Burned captions</span>
+    <span class="pill">9:16 · 1:1 · 16:9</span>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Features</span>
+      <h2>A studio and an editor, in one window</h2>
+      <p>Capture and edit in the same native app. No round-trips, no uploads, no subscription.</p>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="0"/><path d="M8 21h8"/></svg></div>
+        <h3>Screen + camera recorder</h3><p>Capture a display, window, or region — plus your camera and mic. System audio and voice are recorded together, cleanly.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18"/><rect x="13" y="13" width="6" height="6"/></svg></div>
+        <h3>Camera as a layer</h3><p>Square PiP with corner presets, or a true split / side-by-side layout. Center Stage keeps you framed. Switch positions with one click.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/></svg></div>
+        <h3>Edit by transcript</h3><p>On-device transcription turns your words into an editable script. Delete a sentence to cut it from the video — like Descript, but local.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></div>
+        <h3>Cinematic cursor zoom</h3><p>Automatic, smooth zoom-ins that follow your cursor and clicks — the Screen Studio look — fully editable as ranges on the timeline.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14"/><path d="M7 15h6"/></svg></div>
+        <h3>Captions &amp; backgrounds</h3><p>Styled, burned-in captions and macOS-style gradient backgrounds with padding. Pick a preset, ship it.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></div>
+        <h3>One-click reel export</h3><p>Export 9:16, 1:1, or 16:9 with captions burned in and an SRT sidecar. Frame-accurate timeline, instant cut at the playhead.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how" style="background:var(--bg2);border-top:1px solid var(--stroke);border-bottom:1px solid var(--stroke)">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">How it works</span><h2>From record to reel in three steps</h2></div>
+    <div class="steps">
+      <div class="step"><div class="n"></div><h3>Record</h3><p>Pick a screen, window, or your camera. Choose a reel layout — PiP, split, or side-by-side — and hit record. Stop from the floating bar.</p></div>
+      <div class="step"><div class="n"></div><h3>Edit</h3><p>Slipstream transcribes on-device. Trim by deleting words, add zooms and captions, position the camera with presets, drop a background.</p></div>
+      <div class="step"><div class="n"></div><h3>Export</h3><p>Choose your aspect ratio and export a finished short with captions baked in. Everything renders locally — nothing is uploaded.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="compare">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Where Slipstream fits</span>
+      <h2>Recorder, editor, and shorts tool — in one</h2>
+      <p>Most tools own one slice: a recorder, a captioner, or a cloud repurposer. Slipstream covers capture → edit → caption → export, natively and offline.</p>
+    </div>
+    <div class="matrix-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Native&nbsp;app</th>
+            <th>On-device</th>
+            <th>Built-in&nbsp;recorder</th>
+            <th>Cursor&nbsp;zoom</th>
+            <th>Camera&nbsp;PiP/Split</th>
+            <th>Transcript&nbsp;edit</th>
+            <th>Auto&nbsp;captions</th>
+            <th>Pricing</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="us-row">
+            <td class="tool">Slipstream<small>Recorder + reel editor</small></td>
+            <td class="yes">Desktop</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td>
+            <td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Free</td>
+          </tr>
+          <tr>
+            <td class="tool">Descript<small>Transcript A/V editor</small></td>
+            <td class="part">Electron</td><td class="no">Cloud</td><td class="yes">Yes</td><td class="no">No</td>
+            <td class="part">Basic</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">Subscription</td>
+          </tr>
+          <tr>
+            <td class="tool">Screen&nbsp;Studio<small>Screen recorder</small></td>
+            <td class="yes">macOS</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td>
+            <td class="part">Overlay</td><td class="no">No</td><td class="part">Limited</td><td class="no">Paid</td>
+          </tr>
+          <tr>
+            <td class="tool">Submagic<small>AI captions / shorts</small></td>
+            <td class="no">Web</td><td class="no">Cloud</td><td class="no">No</td><td class="no">No</td>
+            <td class="no">No</td><td class="part">Auto-clip</td><td class="yes">Yes</td><td class="no">Subscription</td>
+          </tr>
+          <tr>
+            <td class="tool">OpusClip<small>Long → short repurposer</small></td>
+            <td class="no">Web</td><td class="no">Cloud</td><td class="no">No</td><td class="no">No</td>
+            <td class="no">No</td><td class="part">Auto-clip</td><td class="yes">Yes</td><td class="no">Subscription</td>
+          </tr>
+          <tr>
+            <td class="tool">Riverside<small>Remote recording studio</small></td>
+            <td class="part">Web + app</td><td class="part">Local rec</td><td class="yes">Yes</td><td class="no">No</td>
+            <td class="part">Interview</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">Subscription</td>
+          </tr>
+          <tr>
+            <td class="tool">Firecut<small>AI editor (NLE plugin)</small></td>
+            <td class="part">Plugin</td><td class="part">In NLE</td><td class="no">No</td><td class="no">No</td>
+            <td class="no">No</td><td class="part">Cuts/silence</td><td class="yes">Yes</td><td class="no">Subscription</td>
+          </tr>
+          <tr>
+            <td class="tool">Dreamcut<small>AI video editor</small></td>
+            <td class="no">Web</td><td class="no">Cloud</td><td class="no">No</td><td class="no">No</td>
+            <td class="no">No</td><td class="part">Partial</td><td class="yes">Yes</td><td class="no">Subscription</td>
+          </tr>
+          <tr>
+            <td class="tool">Quso&nbsp;(quso.ai)<small>AI clips + scheduling</small></td>
+            <td class="no">Web</td><td class="no">Cloud</td><td class="no">No</td><td class="no">No</td>
+            <td class="no">No</td><td class="part">Auto-clip</td><td class="yes">Yes</td><td class="no">Subscription</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted" style="text-align:center;margin-top:16px;font-size:12.5px">Comparison reflects each product's general positioning and may be out of date — verify current features and pricing on each vendor's site. "Native app" = first-party desktop app vs. browser/Electron.</p>
+  </div>
+</section>
+
+<section id="download">
+  <div class="wrap">
+    <div class="final">
+      <span class="eyebrow">Free · v1.0</span>
+      <h2>Download Slipstream for your platform</h2>
+      <p>Choose the installer for your desktop. All builds are free, local-first, and ready to record without an account.</p>
+      <div class="download-grid">
+        <article class="download-card">
+          <div>
+            <h3>Windows</h3>
+            <p>x64 installer for Windows desktops.</p>
+          </div>
+          <div class="download-actions">
+            <a class="btn btn-primary" href="download/slipstream-windows-x64-setup.exe">Download .exe</a>
+            <a class="download-link" href="download/slipstream-windows-x64.msi">MSI</a>
+            <a class="download-link" href="download/slipstream-windows-sha256.txt">SHA-256</a>
+          </div>
+          <div class="download-meta">Recommended: setup.exe. Use the MSI for managed installs.</div>
+        </article>
+        <article class="download-card">
+          <div>
+            <h3>macOS</h3>
+            <p>DMG and ZIP builds for Mac.</p>
+          </div>
+          <div class="download-actions">
+            <a class="btn btn-primary" href="download/slipstream-macos.dmg" id="dl">Download .dmg</a>
+            <a class="download-link" href="download/slipstream-macos.zip">ZIP</a>
+          </div>
+          <div class="download-meta">Requires macOS 26.4 or later. Apple silicon and Intel.</div>
+        </article>
+        <article class="download-card">
+          <div>
+            <h3>Linux</h3>
+            <p>x64 AppImage and Debian package.</p>
+          </div>
+          <div class="download-actions">
+            <a class="btn btn-primary" href="download/slipstream-linux-x64.AppImage">Download AppImage</a>
+            <a class="download-link" href="download/slipstream-linux-x64.deb">DEB</a>
+            <a class="download-link" href="download/slipstream-linux-sha256.txt">SHA-256</a>
+          </div>
+          <div class="download-meta">Use AppImage for portable launch, or DEB for Debian-based systems.</div>
+        </article>
+      </div>
+      <div class="cta-row" style="margin-top:18px">
+        <a class="btn btn-ghost" href="https://github.com/REPLACE_ME/slipstream">View on GitHub</a>
+      </div>
+      <div class="reassure">No account · No watermark · Your footage never leaves your machine</div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:24px">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">FAQ</span><h2>Good to know</h2></div>
+    <div class="faq">
+      <details open><summary>Is it really free?</summary><p>Yes. This first version is free and distributed openly. No account, no watermark, no usage caps.</p></details>
+      <details><summary>Does my video get uploaded anywhere?</summary><p>No. Recording, transcription, editing and export all happen on your Mac. Slipstream has no servers and makes no network calls with your footage.</p></details>
+      <details><summary>The app says it "can't be opened" on first launch — why?</summary><p>The first free build isn't notarized by Apple yet, so Gatekeeper is cautious. Right-click the app → <b>Open</b> → <b>Open</b>, or run <code>xattr -dr com.apple.quarantine /Applications/Slipstream.app</code> once.</p></details>
+      <details><summary>What do I need to run it?</summary><p>Pick the build for your platform: Windows x64, macOS 26.4 or later, or Linux x64 via AppImage/DEB. Camera effects like Center Stage and Portrait need supported Mac camera hardware and are captured automatically by the macOS build.</p></details>
+      <details><summary>How is this different from Descript, Screen Studio, OpusClip…?</summary><p>Those each own one slice — a recorder, a captioner, or a cloud repurposer. Slipstream does capture, transcript editing, cursor zoom, camera layouts, captions and export in one native, offline, free app. See the comparison above.</p></details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div class="brand" style="font-size:15px"><span class="logo" style="width:24px;height:24px"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4l13 8-13 8V4z" fill="#fff"/></svg></span> Slipstream</div>
+    <div>Free desktop reel recorder &amp; editor · v1.0</div>
+    <div><a href="https://github.com/REPLACE_ME/slipstream">GitHub</a> · <a href="#download">Download</a> · <a href="#faq">FAQ</a></div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    const p=new URLSearchParams(location.search).get('repo');
+    if(p){document.querySelectorAll('a[href*="REPLACE_ME/slipstream"]').forEach(a=>{
+      a.href=a.href.replace('REPLACE_ME/slipstream',p);});}
+  })();
+</script>
+</body>
+</html>
