@@ -47,6 +47,13 @@ test('github links point to tanzir71 slipstream repo without placeholders', () =
   assert.match(html, /href="https:\/\/github\.com\/tanzir71\/slipstream"/);
 });
 
+test('footer credits the builder and support link', () => {
+  assert.match(
+    html,
+    /built by <a href="https:\/\/tanziro\.com\/">tanziro\.com<\/a> &middot; <a href="https:\/\/buymeacoffee\.com\/tanzir">buy me a coffee<\/a>/,
+  );
+});
+
 test('narrow screens get compact nav and hero rules', () => {
   assert.match(html, /@media\(max-width:520px\)[\s\S]*\.nav-links \.nav-cta\{/);
   assert.match(html, /@media\(max-width:520px\)[\s\S]*h1\{/);
