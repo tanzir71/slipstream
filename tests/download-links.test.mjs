@@ -11,6 +11,7 @@ const downloadFiles = [
   'download/slipstream-windows-sha256.txt',
   'download/slipstream-macos.dmg',
   'download/slipstream-macos.zip',
+  'download/slipstream-macos-sha256.txt',
   'download/slipstream-linux-x64.AppImage',
   'download/slipstream-linux-x64.deb',
   'download/slipstream-linux-sha256.txt',
@@ -35,7 +36,8 @@ test('download section offers Windows, macOS, and Linux builds', () => {
 test('download cards use uniform copy and action rows', () => {
   assert.match(html, /\.download-card\{[^}]*grid-template-rows:108px 94px auto/);
   assert.match(html, /\.download-copy\{[^}]*min-height:86px/);
-  assert.match(html, /\.download-actions\{[^}]*grid-template-columns:minmax\(0,1fr\) 72px/);
+  assert.match(html, /\.download-actions\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(html, /\.download-actions \.btn-primary\{[^}]*grid-column:1\/-1/);
   assert.match(html, /\.download-actions\{[^}]*min-height:94px/);
 });
 
