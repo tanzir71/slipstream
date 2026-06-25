@@ -32,6 +32,19 @@ test('download section offers Windows, macOS, and Linux builds', () => {
   }
 });
 
+test('download cards use uniform copy and action rows', () => {
+  assert.match(html, /\.download-card\{[^}]*grid-template-rows:108px 94px auto/);
+  assert.match(html, /\.download-copy\{[^}]*min-height:86px/);
+  assert.match(html, /\.download-actions\{[^}]*grid-template-columns:minmax\(0,1fr\) 72px/);
+  assert.match(html, /\.download-actions\{[^}]*min-height:94px/);
+});
+
+test('github links point to tanzir71 slipstream repo without placeholders', () => {
+  assert.doesNotMatch(html, /REPLACE_ME/);
+  assert.doesNotMatch(html, /URLSearchParams\(location\.search\)\.get\('repo'\)/);
+  assert.match(html, /href="https:\/\/github\.com\/tanzir71\/slipstream"/);
+});
+
 test('narrow screens get compact nav and hero rules', () => {
   assert.match(html, /@media\(max-width:520px\)[\s\S]*\.nav-links \.nav-cta\{/);
   assert.match(html, /@media\(max-width:520px\)[\s\S]*h1\{/);
